@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y4KKJ99YXK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-Y4KKJ99YXK');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Free online Tirhuta Lipi translator. Convert Devanagari text into Tirhuta script instantly. Supports Maithili with Unicode accuracy.">
+    <meta name="keywords"
+        content="Tirhuta Lipi, Tirhuta script translator, Devanagari to Tirhuta, Maithili Tirhuta script, Mithilakshar converter">
+    <title>Tirhuta Lipi Translator | Devanagari to Tirhuta Converter</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Crimson+Pro:wght@300;400&family=Laila:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0a1420;
+            --paper: #eaf2f8;
+            --rust: #1f4e8b;
+            --gold: #2a7cc4;
+            --shadow: rgba(10, 20, 32, 0.15);
+            --border: rgba(31, 78, 139, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'Crimson Pro', Georgia, serif;
+            min-height: 100vh;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 14px;
+            border: 1.5px solid var(--border);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .page {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 44px 40px 60px;
+        }
+
+        /* ── UI Language Toggle ── */
+        .ui-lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            width: fit-content;
+            margin-left: auto;
+        }
+
+        .ui-lang-btn {
+            padding: 6px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Crimson Pro', serif;
+            font-size: 13px;
+            color: rgba(26, 15, 10, .55);
+            border-right: 1px solid var(--border);
+            transition: all .18s;
+        }
+
+        .ui-lang-btn:last-child {
+            border-right: none;
+        }
+
+        .ui-lang-btn:hover {
+            color: var(--rust);
+            background: rgba(196, 146, 42, .07);
+        }
+
+        .ui-lang-btn.active {
+            background: var(--rust);
+            color: var(--paper);
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .eyebrow {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 12px;
+            letter-spacing: .35em;
+            text-transform: uppercase;
+            color: var(--rust);
+            margin-bottom: 8px;
+        }
+
+        .eyebrow.deva-mode {
+            letter-spacing: 0;
+            text-transform: none;
+            font-size: 14px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(44px, 7vw, 70px);
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--rust);
+        }
+
+        .rule {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 10px 0 6px;
+        }
+
+        .rule-line {
+            height: 1px;
+            width: 70px;
+            background: linear-gradient(to right, transparent, var(--gold));
+        }
+
+        .rule-line.r {
+            background: linear-gradient(to left, transparent, var(--gold));
+        }
+
+        .rule-diamond {
+            width: 7px;
+            height: 7px;
+            background: var(--gold);
+            transform: rotate(45deg);
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: rgba(26, 15, 10, .5);
+            letter-spacing: .04em;
+        }
+
+        /* ── Note ── */
+        .note {
+            border-left: 3px solid var(--gold);
+            padding: 12px 16px;
+            background: rgba(196, 146, 42, .07);
+            border-radius: 0 4px 4px 0;
+            font-size: 13.5px;
+            color: rgba(26, 15, 10, .6);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .note strong {
+            color: var(--rust);
+        }
+
+        .note a {
+            color: var(--rust);
+        }
+
+        /* ── Translator Wrap ── */
+        .translator-wrap {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 28px var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        /* ── Language Bar ── */
+        .lang-bar {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, .5);
+        }
+
+        .lang-fixed {
+            flex: 1;
+            padding: 14px 18px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            letter-spacing: .03em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* ── Swap Button ── */
+        .swap-btn {
+            padding: 0 18px;
+            border: none;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            background: rgba(196, 146, 42, .06);
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--rust);
+            transition: background .2s, color .2s, transform .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swap-btn:hover {
+            background: var(--rust);
+            color: var(--paper);
+        }
+
+        .swap-btn.spin {
+            animation: swapSpin .35s ease;
+        }
+
+        @keyframes swapSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(180deg);
+            }
+        }
+
+        /* ── Translator Card ── */
+        .card {
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr;
+            background: rgba(255, 255, 255, .4);
+            align-items: stretch;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 320px;
+        }
+
+        .panel-head {
+            padding: 12px 18px 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 10px;
+            letter-spacing: .28em;
+            text-transform: uppercase;
+            color: var(--rust);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            background: rgba(196, 146, 42, .06);
+        }
+
+        .panel-head.deva-mode {
+            letter-spacing: 0;
+            text-transform: none;
+            font-size: 12px;
+            font-family: 'Laila', serif;
+        }
+
+        .panel-lang {
+            padding: 5px 18px 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 300;
+            font-style: italic;
+            border-bottom: 1px solid var(--border);
+            background: rgba(196, 146, 42, .06);
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 260px;
+            padding: 18px;
+            border: none;
+            background: transparent;
+            font-family: 'Laila', serif;
+            font-size: 18px;
+            color: var(--ink);
+            resize: none;
+            outline: none;
+            line-height: 1.9;
+        }
+
+        textarea::placeholder {
+            color: rgba(26, 15, 10, .28);
+            font-style: italic;
+        }
+
+        /* Apply Laila to ALL Devanagari content site-wide */
+        .ref-deva,
+        .faq-answer,
+        .faq-item summary,
+        .about-section p,
+        .about-section h2,
+        .faq-section h2,
+        .note,
+        .subtitle,
+        .ui-lang-btn,
+        .panel-head,
+        .lang-fixed,
+        .eyebrow {
+            font-family: 'Laila', 'Cormorant Garamond', serif;
+        }
+
+        /* Override: headings stay Cormorant when in English */
+        .about-section h2,
+        .faq-section h2 {
+            font-family: 'Cormorant Garamond', 'Laila', serif;
+        }
+
+        /* 2. Fix ref-section-title letter-spacing for Devanagari labels */
+        .ref-section-title {
+            letter-spacing: .25em;
+            text-transform: uppercase;
+        }
+
+        .ref-section-title.deva-label {
+            letter-spacing: 0.05em;
+            text-transform: none;
+            font-family: 'Laila', serif;
+            font-size: 12px;
+        }
+
+        .sep {
+            width: 1px;
+            background: var(--border);
+            position: relative;
+        }
+
+        .arrow-circle {
+            display: none;
+        }
+
+        .output-body {
+            flex: 1;
+            min-height: 260px;
+            padding: 18px;
+            font-size: 22px;
+            line-height: 1.9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .placeholder-text {
+            color: rgba(26, 15, 10, .28);
+            font-style: italic;
+            font-family: 'Crimson Pro', serif;
+            font-size: 16px;
+        }
+
+        .modi-out {
+            animation: fadein .3s ease;
+            white-space: pre-wrap;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+                transform: translateY(3px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Loading & Error ── */
+        .loading-state {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 18px;
+            color: rgba(26, 15, 10, .5);
+            font-style: italic;
+            font-size: 15px;
+            font-family: 'Crimson Pro', serif;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--rust);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-state {
+            padding: 18px;
+            color: #8b1a1a;
+            font-style: italic;
+            font-size: 14px;
+            line-height: 1.6;
+            border-left: 3px solid #c0392b;
+            margin: 12px 18px;
+            border-radius: 0 3px 3px 0;
+            background: rgba(192, 57, 43, .05);
+        }
+
+        /* ── Bottom bar ── */
+        .bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 18px;
+            border-top: 1px solid var(--border);
+            background: rgba(196, 146, 42, .04);
+            font-size: 13px;
+            color: rgba(26, 15, 10, .4);
+        }
+
+        .bar-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 18px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Crimson Pro', serif;
+            font-size: 13px;
+            color: rgba(26, 15, 10, .6);
+            background: transparent;
+            transition: all .2s;
+        }
+
+        .btn:hover {
+            border-color: var(--rust);
+            color: var(--rust);
+        }
+
+        .btn-go {
+            padding: 8px 22px;
+            background: var(--rust);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--paper);
+            transition: all .2s;
+        }
+
+        .btn-go:hover {
+            background: #6d2d17;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(139, 58, 31, .3);
+        }
+
+        .btn-go:active {
+            transform: translateY(0);
+        }
+
+        .btn-go:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ── Reference table ── */
+        details {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        summary {
+            padding: 13px 18px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--rust);
+            letter-spacing: .05em;
+            background: rgba(196, 146, 42, .06);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::before {
+            content: '▸';
+            transition: transform .2s;
+            display: inline-block;
+        }
+
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .ref-section-title {
+            padding: 7px 14px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 11px;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            color: var(--rust);
+            background: rgba(196, 146, 42, .04);
+            border-bottom: 1px solid var(--border);
+            border-top: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .ref-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .ref-cell {
+            background: var(--paper);
+            padding: 10px 6px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            text-align: center;
+        }
+
+        .ref-tirhuta {
+            font-size: 22px;
+            line-height: 1.3;
+            color: var(--ink);
+        }
+
+        .ref-deva {
+            font-size: 15px;
+            color: rgba(26, 15, 10, .65);
+            font-family: 'Laila', serif;
+        }
+
+        .ref-rom {
+            font-size: 10px;
+            color: var(--rust);
+            letter-spacing: .05em;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* ── About Section ── */
+        .about-section {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 28px 32px;
+            background: rgba(255, 255, 255, .35);
+            margin-bottom: 20px;
+            line-height: 1.85;
+        }
+
+        .about-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--rust);
+            margin-bottom: 12px;
+            letter-spacing: .02em;
+        }
+
+        .about-section p {
+            font-size: 15px;
+            color: rgba(26, 15, 10, .7);
+        }
+
+        /* ── FAQ Section ── */
+        .faq-section {
+            margin-bottom: 20px;
+        }
+
+        .faq-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--rust);
+            margin-bottom: 14px;
+            letter-spacing: .02em;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, .35);
+        }
+
+        .faq-item summary {
+            padding: 14px 18px;
+            font-family: 'Crimson Pro', serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--ink);
+            letter-spacing: 0;
+            text-transform: none;
+            background: rgba(255, 255, 255, .4);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-item summary::before {
+            content: '▸';
+            color: var(--rust);
+            transition: transform .2s;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .faq-item[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .faq-item[open] summary {
+            background: rgba(196, 146, 42, .06);
+            font-weight: 500;
+        }
+
+        .faq-answer {
+            padding: 14px 18px 16px 40px;
+            font-size: 15px;
+            color: rgba(26, 15, 10, .68);
+            line-height: 1.8;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── New Footer ── */
+        .site-footer {
+            text-align: center;
+            padding: 32px 0 8px;
+            border-top: 1px solid var(--border);
+            margin-top: 12px;
+        }
+
+        .site-footer .footer-main {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+            color: rgba(26, 15, 10, .55);
+            margin-bottom: 8px;
+            letter-spacing: .03em;
+        }
+
+        .site-footer .footer-credits {
+            font-size: 12px;
+            color: rgba(26, 15, 10, .35);
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        .site-footer .footer-credits a {
+            color: rgba(26, 15, 10, .45);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--border);
+        }
+
+        .site-footer .footer-credits a:hover {
+            color: var(--rust);
+        }
+
+        .site-footer .footer-tagline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            font-style: italic;
+            color: rgba(26, 15, 10, .3);
+            margin-bottom: 18px;
+        }
+
+        .site-footer .footer-ornament {
+            color: rgba(26, 15, 10, .18);
+            font-size: 16px;
+            letter-spacing: .3em;
+        }
+
+        @media(max-width: 600px) {
+            .page {
+                padding: 30px 16px 48px;
+            }
+
+            .card {
+                grid-template-columns: 1fr;
+            }
+
+            .sep {
+                display: none;
+            }
+
+            .panel:first-child {
+                border-bottom: 1px solid var(--border);
+            }
+
+            .ui-lang-bar {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .lang-opt {
+                font-size: 12px;
+                padding: 11px 4px;
+                letter-spacing: 0;
+            }
+
+            .swap-btn {
+                padding: 0 12px;
+                font-size: 16px;
+            }
+        }
+
+        /* ── Background Tirhuta letter scatter ── */
+        #tirhuta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 200vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tirhuta-bg"></div>
+
+    <div class="page">
+
+        <!-- UI Language Toggle -->
+        <div class="ui-lang-bar">
+            <button class="ui-lang-btn active" onclick="setUILang('en')">English</button>
+            <button class="ui-lang-btn" onclick="setUILang('hi')">हिंदी</button>
+            <button class="ui-lang-btn" onclick="setUILang('ne')">नेपाली</button>
+            <button class="ui-lang-btn" onclick="setUILang('mai')">मैथिली</button>
+        </div>
+
+        <header>
+            <div class="eyebrow" id="ui-eyebrow">Ancient Script Converter</div>
+            <h1>Tirhuta <em>Lipi</em></h1>
+            <div class="rule">
+                <div class="rule-line"></div>
+                <div class="rule-diamond"></div>
+                <div class="rule-line r"></div>
+            </div>
+            <p class="subtitle" id="ui-subtitle">Convert text across scripts — Devanagari and Tirhuta</p>
+        </header>
+
+        <div class="note">
+            <strong id="ui-note-strong">Font required:</strong>
+            <span id="ui-note-text"> Install <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta"
+                    target="_blank">Noto Sans Tirhuta</a> from Google Fonts so Tirhuta characters display correctly.
+                Without it you will
+                see empty boxes. &nbsp;|&nbsp; <strong>Tip:</strong> Ctrl+Enter to translate. &nbsp;|&nbsp;</span>
+        </div>
+
+        <!-- Translator: language bar + card together -->
+        <div class="translator-wrap">
+
+            <!-- Language Selector Bar -->
+            <div class="lang-bar">
+                <div class="lang-fixed" id="src-label">Devanagari (Maithili)</div>
+                <button class="swap-btn" id="swap-btn" onclick="swapLangs()" title="Swap languages">⇄</button>
+                <div class="lang-fixed" id="tgt-label">Tirhuta Lipi</div>
+            </div>
+
+            <!-- Translator Card -->
+            <div class="card">
+                <div class="panel">
+                    <div class="panel-head" id="ui-input-head">Input</div>
+                    <textarea id="inp" placeholder="देवनागरी में लिखें…" oninput="updateCount()"></textarea>
+                    <div class="bar">
+                        <span id="count">0 <span id="ui-chars">characters</span></span>
+                        <div class="bar-right">
+                            <button class="btn" id="ui-clear-btn" onclick="clearAll()">Clear</button>
+                            <button class="btn-go" id="ui-translate-btn" onclick="doTranslate()">Translate</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sep">
+                    <div class="arrow-circle">⟶</div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head" id="ui-output-head">Output</div>
+                    <div class="output-body" id="out">
+                        <span class="placeholder-text">Tirhuta script will appear here…</span>
+                    </div>
+                    <div class="bar">
+                        <span id="out-info"></span>
+                        <div class="bar-right">
+                            <button class="btn" id="copy-btn" style="display:none" onclick="copyOut()"
+                                data-label="Copy">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.translator-wrap -->
+
+        <!-- Reference Chart -->
+        <details>
+            <summary><span id="ui-ref-title-text">Tirhuta Script Reference Chart (Unicode)</span></summary>
+            <div class="ref-section-title" id="ui-ref-vowels">Independent Vowels</div>
+            <div class="ref-table" id="ref-vowels"></div>
+            <div class="ref-section-title" id="ui-ref-cons">Consonants</div>
+            <div class="ref-table" id="ref-cons"></div>
+            <div class="ref-section-title" id="ui-ref-matras">Dependent Vowel Signs (Matras)</div>
+            <div class="ref-table" id="ref-matras"></div>
+            <div class="ref-section-title" id="ui-ref-signs">Various Signs &amp; Punctuation</div>
+            <div class="ref-table" id="ref-signs"></div>
+            <div class="ref-section-title" id="ui-ref-digits">Digits</div>
+            <div class="ref-table" id="ref-digits"></div>
+        </details>
+
+        <!-- About Tirhuta Script -->
+        <div class="about-section">
+            <h2>About Tirhuta Script</h2>
+            <p>
+                Tirhuta (also known as Mithilakshar) is the traditional script of the Maithili language, spoken by more
+                than
+                35 million people in Bihar, India, and the Narayani and Janakpur zones of Nepal. A Brahmi-based script
+                derived
+                from Gauḍī (Proto-Bengali), Tirhuta became differentiated from related scripts — Bengali, Newari, and
+                Oriya —
+                by the 14th century. The earliest Tirhuta inscriptions date to the 13th century on temples in Bihar and
+                Nepal.
+                For centuries the Maithil Brahmin and Kayasth communities used Tirhuta to maintain pañjī (genealogical
+                records),
+                and it remains in use for religious manuscripts, literary texts, and personal correspondence. Printing
+                in Tirhuta
+                began in the 1920s; today several literary societies continue publishing in it. The Indian Government
+                recognised
+                Maithili as a scheduled language in 2004, reviving interest in Tirhuta. Unicode encoded Tirhuta at
+                U+11480–U+114DF,
+                and this translator maps every character directly from that standard — a small step toward preserving
+                Mithila's
+                written heritage for future generations.
+            </p>
+
+            <div style="margin-top: 24px; text-align: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Map_of_full_Mithila.png"
+                    alt="Map of Mithila"
+                    style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--border);">
+                <p
+                    style="font-size: 12px; color: rgba(26, 15, 10, 0.5); margin-top: 8px; font-style: italic; line-height: 1.4;">
+                    Map of the Mithila region. <br>
+                    <a href="https://commons.wikimedia.org/wiki/File:Map_of_full_Mithila.png" target="_blank"
+                        style="color: var(--rust);">Source</a>
+                    licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank"
+                        style="color: var(--rust);">CC BY-SA 4.0</a>.
+                </p>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <details class="faq-item">
+                <summary>What is Tirhuta Lipi?</summary>
+                <div class="faq-answer">
+                    Tirhuta (also called Mithilakshar or Maithili script) is the traditional script used to write the
+                    Maithili
+                    language, the primary language of the Mithila region spanning Bihar (India) and parts of Nepal. It
+                    is a
+                    Brahmi-derived abugida related to Bengali, Newari, and Oriya scripts, and has been in use since at
+                    least the
+                    13th century.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary>Is Tirhuta script still used today?</summary>
+                <div class="faq-answer">
+                    Yes. Although Devanagari became the dominant script for Maithili in the 20th century, Tirhuta
+                    continues to be
+                    used for religious manuscripts, genealogical records (pañjī), literary publications, and signage in
+                    parts of
+                    north Bihar. Literary societies such as the Maithili Akademi publish in Tirhuta, and interest has
+                    grown since
+                    Maithili received scheduled-language status in India in 2004. Unicode encoded Tirhuta in version 7.0
+                    (2014),
+                    enabling its digital use.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary>How do I type Tirhuta script on my computer?</summary>
+                <div class="faq-answer">
+                    The easiest way is to use this translator — type Devanagari (Maithili) text and it will instantly
+                    convert it
+                    to Tirhuta Unicode characters. To display Tirhuta correctly, install the <a
+                        href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank"
+                        style="color:var(--rust)">Noto
+                        Sans Tirhuta</a> font on your device. For dedicated typing, keyboard layouts for Tirhuta script
+                    exist but
+                    are not yet widely standardised.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary>How accurate is this Devanagari to Tirhuta converter?</summary>
+                <div class="faq-answer">
+                    This tool performs a direct Unicode character-to-character mapping based on the official Unicode
+                    Standard for
+                    both Devanagari (U+0900–U+097F) and Tirhuta (U+11480–U+114DF), sourced from the Unicode encoding
+                    proposal
+                    (L2/11-175R) by Anshuman Pandey. Every consonant, vowel, vowel sign (matra), virama, anusvara,
+                    visarga,
+                    punctuation mark, and digit is mapped correctly. It is a script converter, not a language translator
+                    —
+                    meaning it converts the written form of Maithili from one script to another without changing the
+                    language.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary>What is the difference between Tirhuta and Devanagari?</summary>
+                <div class="faq-answer">
+                    Both scripts can be used to write Maithili, but they look very different. Devanagari is
+                    block-printed with a
+                    characteristic horizontal headline (shirorekha). Tirhuta has its own distinct letterforms — some
+                    resemble
+                    Bengali due to their shared Gauḍī ancestry, but the two scripts are not mutually intelligible in
+                    writing.
+                    Tirhuta was the primary script of Mithila until the 20th century, when Devanagari became more
+                    common.
+                    Think of them as two different writing systems for the same language.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary>Can I use this tool for research or academic work?</summary>
+                <div class="faq-answer">
+                    Yes. This tool is free to use for personal, educational, and research purposes. The Unicode mappings
+                    are
+                    sourced from the Unicode Standard and the authoritative Tirhuta encoding proposal (L2/11-175R by
+                    Anshuman
+                    Pandey, University of Michigan), making the output academically reliable for script conversion. If
+                    you are
+                    working with historical Tirhuta manuscripts, note that older texts may use variant letterforms not
+                    fully
+                    covered by Unicode — in such cases, specialist scholarship is recommended alongside this tool.
+                </div>
+            </details>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="site-footer">
+            <div class="footer-main">© 2025 Tirhuta Lipi Translator — Built to preserve the script of Mithila</div>
+            <div class="footer-credits">
+                Unicode mappings sourced from <a href="https://www.unicode.org/charts/" target="_blank">Unicode
+                    Standard</a>
+                &amp; <a href="https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf" target="_blank">L2/11-175R (Pandey
+                    2011)</a>
+                &nbsp;·&nbsp; Tirhuta script rendered using <a
+                    href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank">Noto Sans
+                    Tirhuta</a>
+                &nbsp;·&nbsp; Devanagari rendered using <a href="https://fonts.google.com/specimen/Laila"
+                    target="_blank">Laila</a>
+            </div>
+            <div class="footer-tagline">Tirhuta (तिरहुता) — the traditional script of Maithili and Mithila</div>
+            <div class="footer-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+        </div>
+
+    </div><!-- /.page -->
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // UI LANGUAGE STRINGS
+        // ═══════════════════════════════════════════════════════════════════════
+        const UI = {
+            en: {
+                eyebrow: 'Ancient Script Converter',
+                subtitle: 'Convert text across scripts — Devanagari and Tirhuta',
+                noteStrong: 'Font required:',
+                noteText: 'Install <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank">Noto Sans Tirhuta</a> from Google Fonts so Tirhuta characters display correctly. Without it you will see empty boxes. &nbsp;|&nbsp; <strong>Tip:</strong> Ctrl+Enter to translate. &nbsp;|&nbsp',
+                inputHead: 'INPUT',
+                inputLang: 'Devanagari',
+                outputHead: 'OUTPUT',
+                chars: 'characters',
+                placeholder: 'Type or paste text here…',
+                clearBtn: 'Clear',
+                translateBtn: 'Translate',
+                copyBtn: 'Copy',
+                copiedBtn: 'Copied!',
+                outPlaceholder: 'Translation will appear here…',
+                loading: 'Translating…',
+                errConn: 'Translation service unavailable. Please check your connection and try again.',
+                refTitle: 'Tirhuta Script Reference Chart (Unicode)',
+                refVowels: 'Independent Vowels',
+                refCons: 'Consonants',
+                refMatras: 'Dependent Vowel Signs (Matras)',
+                refSigns: 'Various Signs & Punctuation',
+                refDigits: 'Digits',
+            },
+            hi: {
+                eyebrow: 'प्राचीन लिपि परिवर्तक',
+                subtitle: 'देवनागरी और तिरहुता लिपि के बीच रूपान्तरण करें',
+                noteStrong: 'फ़ॉन्ट आवश्यक:',
+                noteText: 'तिरहुता अक्षर सही दिखाने के लिए Google Fonts से <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank">Noto Sans Tirhuta</a> इंस्टॉल करें। इसके बिना खाली बक्से दिखेंगे। &nbsp;|&nbsp; <strong>सुझाव:</strong> Ctrl+Enter दबाएँ। &nbsp;|&nbsp',
+                inputHead: 'इनपुट',
+                inputLang: 'देवनागरी',
+                outputHead: 'आउटपुट',
+                chars: 'अक्षर',
+                placeholder: 'यहाँ पाठ लिखें…',
+                clearBtn: 'साफ़ करें',
+                translateBtn: 'रूपान्तरण करें',
+                copyBtn: 'कॉपी करें',
+                copiedBtn: 'कॉपी हुआ!',
+                outPlaceholder: 'रूपान्तरण यहाँ दिखेगा…',
+                loading: 'रूपान्तरण हो रहा है…',
+                errConn: 'सेवा अनुपलब्ध। इंटरनेट जाँचें और पुनः प्रयास करें।',
+                refTitle: 'तिरहुता लिपि संदर्भ तालिका (Unicode)',
+                refVowels: 'स्वर',
+                refCons: 'व्यंजन',
+                refMatras: 'मात्राएँ',
+                refSigns: 'विविध चिह्न एवं विराम',
+                refDigits: 'अंक',
+            },
+            ne: {
+                eyebrow: 'प्राचीन लिपि परिवर्तक',
+                subtitle: 'देवनागरी र तिरहुता लिपिबिच रूपान्तरण गर्नुहोस्',
+                noteStrong: 'फन्ट आवश्यक:',
+                noteText: 'तिरहुता अक्षरहरू सही देखाउन Google Fonts बाट <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank">Noto Sans Tirhuta</a> स्थापना गर्नुहोस्। यसबिना खाली बाकसहरू देखिनेछन्। &nbsp;|&nbsp; <strong>सुझाव:</strong> Ctrl+Enter थिच्नुहोस्। &nbsp;|&nbsp',
+                inputHead: 'इनपुट',
+                inputLang: 'देवनागरी',
+                outputHead: 'आउटपुट',
+                chars: 'वर्णहरू',
+                placeholder: 'यहाँ पाठ लेख्नुहोस्…',
+                clearBtn: 'मेटाउनुहोस्',
+                translateBtn: 'रूपान्तरण गर्नुहोस्',
+                copyBtn: 'प्रतिलिपि गर्नुहोस्',
+                copiedBtn: 'प्रतिलिपि भयो!',
+                outPlaceholder: 'रूपान्तरण यहाँ देखिनेछ…',
+                loading: 'रूपान्तरण भइरहेछ…',
+                errConn: 'सेवा अनुपलब्ध। इन्टरनेट जाँच्नुहोस् र पुनः प्रयास गर्नुहोस्।',
+                refTitle: 'तिरहुता लिपि सन्दर्भ चार्ट (Unicode)',
+                refVowels: 'स्वर',
+                refCons: 'व्यञ्जन',
+                refMatras: 'मात्राहरू',
+                refSigns: 'विविध चिह्न र विराम',
+                refDigits: 'अङ्कहरू',
+            },
+            mai: {
+                eyebrow: 'प्राचीन लिपि परिवर्तक',
+                subtitle: 'देवनागरी आ तिरहुता लिपिक बीच रूपान्तरण',
+                noteStrong: 'फ़ॉन्ट आवश्यक:',
+                noteText: 'तिरहुता अक्षर सही देखबाक लेल Google Fonts सँ <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank">Noto Sans Tirhuta</a> इंस्टॉल करू। एकर बिना खाली बक्स देखाएत। &nbsp;|&nbsp; <strong>सुझाव:</strong> Ctrl+Enter दबाउ। &nbsp;|&nbsp',
+                inputHead: 'प्रवेश',
+                inputLang: 'देवनागरी',
+                outputHead: 'निर्गम',
+                chars: 'अक्षर',
+                placeholder: 'ऐठाम पाठ लिखू…',
+                clearBtn: 'साफ़ करू',
+                translateBtn: 'रूपान्तरण करू',
+                copyBtn: 'कॉपी करू',
+                copiedBtn: 'कॉपी भेल!',
+                outPlaceholder: 'रूपान्तरण ऐठाम देखाएत…',
+                loading: 'रूपान्तरण भ\' रहल अछि…',
+                errConn: 'सेवा अनुपलब्ध। इंटरनेट जाँचू आ फेर प्रयास करू।',
+                refTitle: 'तिरहुता लिपि संदर्भ तालिका (Unicode)',
+                refVowels: 'स्वर',
+                refCons: 'व्यंजन',
+                refMatras: 'मात्राएँ',
+                refSigns: 'विविध चिह्न',
+                refDigits: 'अंक',
+            }
+        };
+
+        // Language names in all UI languages
+        const LANG_NAMES = {
+            deva: { en: 'Devanagari (Maithili)', hi: 'देवनागरी (मैथिली)', ne: 'देवनागरी (मैथिली)', mai: 'देवनागरी (मैथिली)' },
+            tirhuta: { en: 'Tirhuta Lipi', hi: 'तिरहुता लिपि', ne: 'तिरहुता लिपि', mai: 'तिरहुता लिपि' },
+        };
+
+        let currentUILang = 'en';
+        let srcLang = 'deva';
+        let tgtLang = 'tirhuta';
+        let lastResult = '';
+
+        function setUILang(lang) {
+            currentUILang = lang;
+            document.querySelectorAll('.ui-lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.ui-lang-btn[onclick="setUILang('${lang}')"]`).classList.add('active');
+            const s = UI[lang];
+            const isIndic = lang !== 'en';
+            const eyebrow = document.getElementById('ui-eyebrow');
+            eyebrow.textContent = s.eyebrow;
+            eyebrow.classList.toggle('deva-mode', isIndic);
+            document.getElementById('ui-subtitle').textContent = s.subtitle;
+            document.getElementById('ui-note-strong').textContent = s.noteStrong;
+            document.getElementById('ui-note-text').innerHTML = s.noteText;
+            document.getElementById('ui-output-head').textContent = s.outputHead;
+            document.getElementById('ui-chars').textContent = s.chars;
+            document.getElementById('inp').placeholder = s.placeholder;
+            document.getElementById('ui-clear-btn').textContent = s.clearBtn;
+            document.getElementById('ui-translate-btn').textContent = s.translateBtn;
+            document.getElementById('ui-ref-title-text').textContent = s.refTitle;
+            document.getElementById('ui-ref-vowels').textContent = s.refVowels;
+            document.getElementById('ui-ref-cons').textContent = s.refCons;
+            document.getElementById('ui-ref-matras').textContent = s.refMatras;
+            document.getElementById('ui-ref-signs').textContent = s.refSigns;
+            document.getElementById('ui-ref-digits').textContent = s.refDigits;
+            const copyBtn = document.getElementById('copy-btn');
+            copyBtn.dataset.label = s.copyBtn;
+            if (copyBtn.textContent !== s.copiedBtn) copyBtn.textContent = s.copyBtn;
+            const ph = document.getElementById('out').querySelector('.placeholder-text');
+            if (ph) ph.textContent = s.outPlaceholder;
+            // Fix panel-head letter-spacing for Indic UI
+            const heads = document.querySelectorAll('.panel-head');
+            heads.forEach(h => h.classList.toggle('deva-mode', isIndic));
+            // Fix ref-section-title letter-spacing for Indic UI
+            const refTitles = document.querySelectorAll('.ref-section-title');
+            refTitles.forEach(t => t.classList.toggle('deva-label', isIndic));
+            updateLangBar();
+            updateAboutFAQ(lang);
+        }
+
+        function updateLangBar() {
+            const uiL = currentUILang;
+            document.getElementById('src-label').textContent = LANG_NAMES[srcLang][uiL];
+            document.getElementById('tgt-label').textContent = LANG_NAMES[tgtLang][uiL];
+            // input head
+            const inputHead = document.getElementById('ui-input-head');
+            inputHead.textContent = UI[uiL].inputHead;
+            inputHead.classList.toggle('deva-mode', uiL !== 'en');
+        }
+
+        function swapLangs() {
+            [srcLang, tgtLang] = [tgtLang, srcLang];
+            if (lastResult) {
+                document.getElementById('inp').value = lastResult;
+                updateCount();
+            }
+            clearOutput();
+            updateLangBar();
+            const btn = document.getElementById('swap-btn');
+            btn.classList.remove('spin');
+            void btn.offsetWidth;
+            btn.classList.add('spin');
+            setTimeout(() => btn.classList.remove('spin'), 400);
+        }
+
+        // ── About & FAQ multilingual content ─────────────────────────────────────
+        const ABOUT_CONTENT = {
+            en: {
+                aboutTitle: 'About Tirhuta Script',
+                aboutText: `Tirhuta (also known as Mithilakshar) is the traditional script of the Maithili language, spoken by more than 35 million people in Bihar, India, and the Narayani and Janakpur zones of Nepal. A Brahmi-based script derived from Gauḍī (Proto-Bengali), Tirhuta became differentiated from related scripts — Bengali, Newari, and Oriya — by the 14th century. The earliest Tirhuta inscriptions date to the 13th century on temples in Bihar and Nepal. For centuries the Maithil Brahmin and Kayasth communities used Tirhuta to maintain pañjī (genealogical records), and it remains in use for religious manuscripts, literary texts, and personal correspondence. Printing in Tirhuta began in the 1920s; today several literary societies continue publishing in it. The Indian Government recognised Maithili as a scheduled language in 2004, reviving interest in Tirhuta. Unicode encoded Tirhuta at U+11480–U+114DF, and this translator maps every character directly from that standard — a small step toward preserving Mithila's written heritage for future generations.`,
+                faqTitle: 'Frequently Asked Questions',
+                faqs: [
+                    { q: 'What is Tirhuta Lipi?', a: 'Tirhuta (also called Mithilakshar or Maithili script) is the traditional script used to write the Maithili language, the primary language of the Mithila region spanning Bihar (India) and parts of Nepal. It is a Brahmi-derived abugida related to Bengali, Newari, and Oriya scripts, and has been in use since at least the 13th century.' },
+                    { q: 'Is Tirhuta script still used today?', a: 'Yes. Although Devanagari became the dominant script for Maithili in the 20th century, Tirhuta continues to be used for religious manuscripts, genealogical records (pañjī), literary publications, and signage in parts of north Bihar. Literary societies such as the Maithili Akademi publish in Tirhuta, and interest has grown since Maithili received scheduled-language status in India in 2004. Unicode encoded Tirhuta in version 7.0 (2014), enabling its digital use.' },
+                    { q: 'How do I type Tirhuta script on my computer?', a: 'The easiest way is to use this translator — type Devanagari (Maithili) text and it will instantly convert it to Tirhuta Unicode characters. To display Tirhuta correctly, install the <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank" style="color:var(--rust)">Noto Sans Tirhuta</a> font on your device. For dedicated typing, keyboard layouts for Tirhuta script exist but are not yet widely standardised.' },
+                    { q: 'How accurate is this Devanagari to Tirhuta converter?', a: 'This tool performs a direct Unicode character-to-character mapping based on the official Unicode Standard for both Devanagari (U+0900–U+097F) and Tirhuta (U+11480–U+114DF), sourced from the Unicode encoding proposal (L2/11-175R) by Anshuman Pandey. Every consonant, vowel, vowel sign (matra), virama, anusvara, visarga, punctuation mark, and digit is mapped correctly. It is a script converter, not a language translator — meaning it converts the written form of Maithili from one script to another without changing the language.' },
+                    { q: 'What is the difference between Tirhuta and Devanagari?', a: 'Both scripts can be used to write Maithili, but they look very different. Devanagari is block-printed with a characteristic horizontal headline (shirorekha). Tirhuta has its own distinct letterforms — some resemble Bengali due to their shared Gauḍī ancestry, but the two scripts are not mutually intelligible in writing. Tirhuta was the primary script of Mithila until the 20th century, when Devanagari became more common.' },
+                    { q: 'Can I use this tool for research or academic work?', a: 'Yes. This tool is free to use for personal, educational, and research purposes. The Unicode mappings are sourced from the Unicode Standard and the authoritative Tirhuta encoding proposal (L2/11-175R by Anshuman Pandey, University of Michigan), making the output academically reliable for script conversion. If you are working with historical Tirhuta manuscripts, note that older texts may use variant letterforms not fully covered by Unicode — in such cases, specialist scholarship is recommended alongside this tool.' },
+                ]
+            },
+            hi: {
+                aboutTitle: 'तिरहुता लिपि के बारे में',
+                aboutText: 'तिरहुता (जिसे मिथिलाक्षर भी कहा जाता है) मैथिली भाषा की पारंपरिक लिपि है, जो भारत के बिहार राज्य और नेपाल के नारायणी तथा जनकपुर क्षेत्रों में ३५ मिलियन से अधिक लोग बोलते हैं। गाउड़ी (प्रोटो-बंगाली) से व्युत्पन्न ब्राह्मी-आधारित लिपि, तिर्हुता १४वीं शताब्दी तक बंगाली, नेवारी और ओडिया जैसी संबंधित लिपियों से अलग हो गई थी। बिहार और नेपाल के मंदिरों पर तिर्हुता के सबसे पुराने शिलालेख १३वीं शताब्दी के हैं। शताब्दियों तक मैथिल ब्राह्मण और कायस्थ समुदाय पञ्जी (वंशावली अभिलेख) बनाए रखने के लिए तिर्हुत का उपयोग करते थे, और यह धार्मिक पांडुलिपियों, साहित्यिक ग्रंथों और व्यक्तिगत पत्राचार के लिए उपयोग में बना हुआ है। तिर्हुत में मुद्रण १९२० के दशक में शुरू हुआ; आज कई साहित्यिक समाज इसमें प्रकाशन जारी रखते हैं। भारतीय सरकार ने २००४ में मैथिली को एक अनुसूचित भाषा के रूप में मान्यता दी, जिससे तिर्हुत में रुचि फिर से जागृत हुई। यूनिकोड ने तिर्हुत को U+11480–U+114DF पर एन्कोड किया, और यह अनुवादक उस मानक से प्रत्येक अक्षर का सीधे अनुवाद करता है — मिथिला की लिखित विरासत को आने वाली पीढ़ियों के लिए संरक्षित करने की दिशा में एक छोटा कदम।',
+                faqTitle: 'अक्सर पूछे जाने वाले प्रश्न',
+                faqs: [
+                    { q: 'तिरहुता लिपि क्या है?', a: 'तिरहुता (जिसे मिथिलाक्षर या मैथिल लिपि भी कहा जाता है) मिथिला क्षेत्र की मुख्य भाषा मैथिली लिखने के लिए प्रयुक्त पारंपरिक लिपि है, जो बिहार (भारत) और नेपाल के कुछ हिस्सों में फैला हुआ है। यह ब्राह्मी-उत्पन्न एक अक्षरमाला है, जो बांग्ला, नेवारी और ओडिया लिपियों से संबंधित है, और कम से कम १३वीं शताब्दी से प्रचलन में है।' },
+                    { q: 'क्या तिरहुता लिपि आज भी प्रयोग में है?', a: 'हाँ। यद्यपि २०वीं सदी में मैथिली के लिए देवनागरी प्रमुख लिपि बन गई, तिरहुता उत्तर बिहार के कुछ हिस्सों में धार्मिक पांडुलिपियों, वंशावली अभिलेखों (पंजी), साहित्यिक प्रकाशनों और संकेत-चिह्नों के लिए अब भी प्रयुक्त होती है। मैथिली अकादमी जैसी साहित्यिक संस्थाएँ तिरहुता में प्रकाशन करती हैं, और २००४ में भारत में मैथिली को अनुसूचित भाषा का दर्जा मिलने के बाद इसमें रुचि बढ़ी है। यूनिकोड ने संस्करण 7.0 (२०१४) में तिरहुता को एन्कोड किया, जिससे इसका डिजिटल उपयोग संभव हो गया।' },
+                    { q: 'कंप्यूटर पर तिरहुता में कैसे टाइप करें?', a: 'सबसे आसान तरीका इस परिवर्तक का उपयोग करना है — देवनागरी (मैथिली) टेक्स्ट टाइप करें और यह तुरंत उसे तिरहुता यूनिकोड अक्षरों में बदल देगा। तिरहुता सही दिखाने के लिए अपने डिवाइस पर <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank" style="color:var(--rust)">Noto Sans Tirhuta</a> फ़ॉन्ट इंस्टॉल करें।' },
+                    { q: 'यह रूपांतरण कितना सटीक है?', a: 'यह उपकरण देवनागरी (U+0900–U+097F) और तिर्हुता (U+11480–U+114DF) दोनों के लिए आधिकारिक यूनिकोड मानक पर आधारित प्रत्यक्ष यूनिकोड वर्ण-से-वर्ण मैपिंग करता है, जो अंशुमान पांडे द्वारा प्रस्तुत यूनिकोड एन्कोडिंग प्रस्ताव (L2/11-175R) से लिया गया है। प्रत्येक व्यंजन, स्वर, मात्रा चिह्न, विराम, अनुस्वर, विसर्ग, विराम चिह्न और अंक सही ढंग से मैप किए गए हैं। यह एक लिपि रूपांतरक है, भाषा अनुवादक नहीं — अर्थात् यह भाषा को बदले बिना मैथिली के लिखित रूप को एक लिपि से दूसरी लिपि में परिवर्तित करता है।' },
+                    { q: 'तिरहुता और देवनागरी में क्या अंतर है?', a: 'दोनों लिपियों का उपयोग मैथिली लिखने के लिए किया जा सकता है, लेकिन वे दिखने में बहुत अलग हैं। देवनागरी को एक विशिष्ट क्षैतिज शीर्षरेखा (शिरोरेखा) के साथ ब्लॉक-प्रिंट किया जाता है। तिरहुता के अपने विशिष्ट अक्षर-रूप हैं — कुछ अपने साझा गौड़ी वंश के कारण बंगाली से मिलते-जुलते हैं, लेकिन लिखित रूप में ये दोनों लिपियाँ एक-दूसरे को समझने योग्य नहीं हैं। तिरहुता 20वीं सदी तक मिथिला की प्रमुख लिपि थी, जब देवनागरी अधिक प्रचलित हो गई।' },
+                    { q: 'क्या इसे शोध कार्य के लिए उपयोग कर सकते हैं?', a: 'हाँ। यह उपकरण व्यक्तिगत, शैक्षिक और अनुसंधान उद्देश्यों के लिए उपयोग करने हेतु निःशुल्क है। यूनिकोड मैपिंग्स यूनिकोड मानक और आधिकारिक तिर्हुता एन्कोडिंग प्रस्ताव (L2/11-175R, अंशुमान पांडे, मिशिगन विश्वविद्यालय) से ली गई हैं, जिससे यह स्क्रिप्ट रूपांतरण के लिए शैक्षणिक रूप से विश्वसनीय आउटपुट प्रदान करता है। यदि आप ऐतिहासिक तिर्हुता पांडुलिपियों पर काम कर रहे हैं, तो ध्यान दें कि पुराने ग्रंथ ऐसे वैकल्पिक अक्षर रूपों का उपयोग कर सकते हैं जिन्हें यूनिकोड पूरी तरह से कवर नहीं करता — ऐसे मामलों में, इस उपकरण के साथ विशेषज्ञ विद्वत्ता की भी सिफारिश की जाती है।' },
+                ]
+            },
+            ne: {
+                aboutTitle: 'तिरहुता लिपिको बारेमा',
+                aboutText: 'तिरहुता (जसलाई मिथिलाक्षर पनि भनिन्छ) मैथिली भाषाको परम्परागत लिपि हो, जुन भारतको बिहार राज्य र नेपालको नारायणी तथा जनकपुर क्षेत्रका ३.५ करोडभन्दा बढी मानिसहरूद्वारा बोल्ने गरिन्छ। गौडी (प्रोटो-बंगाली) बाट विकसित यस ब्राह्मी-आधारित लिपि १४औँ शताब्दीसम्ममा बंगाली, नेवारी र ओडिया जस्ता सम्बन्धित लिपिहरूबाट छुट्टिएर आफ्नो छुट्टै पहिचान बनाइसकेको थियो। बिहार र नेपालका मन्दिरहरूमा भेटिएका तिरहुताका सबैभन्दा पुराना शिलालेखहरू १३औँ शताब्दीका छन्। शताब्दीऔँदेखि मैथिल ब्राह्मण र कायस्थ समुदायले पञ्जी (वंशावली अभिलेख) राख्नका लागि तिरहुताको प्रयोग गर्दै आएका थिए र यो आज पनि धार्मिक पाण्डुलिपि, साहित्यिक ग्रन्थ र व्यक्तिगत पत्रचारका लागि प्रयोगमा रहेको छ। तिरहुतामा मुद्रणको सुरुवात सन् १९२० को दशकमा भएको थियो भने आज धेरै साहित्यिक संस्थाहरूले यस लिपिमा प्रकाशनहरू जारी राखेका छन्। सन् २००४ मा भारत सरकारले मैथिलीलाई अनुसूचित भाषाको रूपमा मान्यता दिएपछि तिरहुताप्रति चासो पुनः जागृत भएको हो। युनिकोडले तिरहुतालाई U+11480–U+114DF मा एन्कोड गरेको छ र यो अनुवादकले सोही मानक अनुसार प्रत्येक अक्षरलाई सिधै रूपान्तरण गर्दछ—जुन मिथिलाको लिखित विरासतलाई भावी पुस्ताका लागि संरक्षण गर्ने दिशामा एउटा सानो तर महत्त्वपूर्ण कदम हो।',
+                faqTitle: 'प्रायः सोधिने प्रश्नहरू',
+                faqs: [
+                    { q: 'तिरहुता लिपि के हो?', a: 'तिरहुता (जसलाई मिथिलाक्षर वा मैथिल लिपि पनि भनिन्छ) मिथिला क्षेत्रको मुख्य भाषा मैथिली लेख्न प्रयोग गरिने परम्परागत लिपि हो, जुन भारतको बिहार र नेपालका केही भू-भागहरूमा फैलिएको छ। ब्राह्मी लिपिबाट विकसित यो एक प्राचीन अक्षरमाला हो, जसको सम्बन्ध बंगाली, नेवारी र ओडिया लिपिहरूसँग रहेको छ र यो कम्तीमा १३औँ शताब्दीदेखि नै प्रचलनमा रहिआएको छ।' },
+                    { q: 'तिरहुता लिपि आज पनि प्रयोगमा छ?', a: 'हो, २०औँ शताब्दीमा मैथिली भाषाका लागि देवनागरी प्रमुख लिपि बने तापनि तिरहुता अझै पनि उत्तर बिहारका केही भागहरूमा धार्मिक पाण्डुलिपि, वंशावली अभिलेख (पञ्जी), साहित्यिक प्रकाशन र संकेत-चिन्हहरूका लागि प्रयोग भइरहेको छ। मैथिली अकादमी जस्ता साहित्यिक संस्थाहरूले तिरहुता लिपिमा कृतिहरू प्रकाशन गर्दै आएका छन् भने सन् २००४ मा भारतमा मैथिलीले अनुसूचित भाषाको दर्जा पाएपछि यस लिपिप्रति चासो र आकर्षण थप बढेको छ। युनिकोडले सन् २०१४ मा संस्करण ७.० अन्तर्गत तिरहुतालाई समावेश गरेपछि यसको डिजिटल प्रयोग र संरक्षण अझ सहज र सम्भव भएको छ।' },
+                    { q: 'कम्प्युटरमा तिरहुतामा कसरी टाइप गर्ने?', a: 'सबैभन्दा सजिलो तरिका यो परिवर्तक प्रयोग गर्नु हो — देवनागरी (मैथिली) पाठ टाइप गर्नुहोस् र यो तुरुन्तै तिरहुता Unicode अक्षरमा बदल्नेछ। तिरहुता सही देखाउन आफ्नो यन्त्रमा <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank" style="color:var(--rust)">Noto Sans Tirhuta</a> फन्ट स्थापना गर्नुहोस्।' },
+                    { q: 'यो रूपान्तरण कति सटीक छ?', a: 'यस उपकरणले देवनागरी (U+0900–U+097F) र तिरहुता (U+11480–U+114DF) दुवैका लागि आधिकारिक युनिकोड मानकमा आधारित प्रत्यक्ष वर्ण-देखि-वर्ण म्यापिङ गर्दछ, जुन अंशुमान पाण्डेद्वारा प्रस्तुत युनिकोड इन्कोडिङ प्रस्ताव (L2/11-175R) बाट लिइएको हो। यसमा प्रत्येक व्यञ्जन, स्वर, मात्रा चिह्न, हलन्त, अनुस्वार, विसर्ग, विराम चिह्न र अङ्कहरूलाई सही रूपमा म्याप गरिएको छ। स्मरणीय रहोस्, यो एक लिपि रूपान्तरण उपकरण (Transliteration tool) हो, भाषा अनुवादक होइन—अर्थात्, यसले भाषालाई नबदली मैथिलीको लिखित रूपलाई एउटा लिपिबाट अर्को लिपिमा मात्र परिवर्तन गर्दछ।' },
+                    { q: 'तिरहुता र देवनागरीमा के फरक छ?', a: 'दुवै लिपिहरू मैथिली लेख्नका लागि प्रयोग गर्न सकिन्छ, तर यिनीहरूको स्वरूप भने निकै भिन्न छ। देवनागरीलाई एउटा विशिष्ट तेर्सो शिरोरेखाद्वारा चिनिन्छ भने तिरहुताका आफ्नै मौलिक अक्षर-रूपहरू रहेका छन्—जसमध्ये केही साझा गौडी वंशका कारण बंगालीसँग मिल्दोजुल्दा देखिन्छन्, तर व्यावहारिक रूपमा यी दुवै लिपिहरू एक-अर्कालाई बुझ्न सकिने खालका छैनन्। २०औँ शताब्दीसम्म तिरहुता नै मिथिलाको प्रमुख लिपि थियो, तर पछि देवनागरी बढी प्रचलित हुँदै गएको हो।' },
+                    { q: 'के यो उपकरण अनुसन्धान कार्यका लागि प्रयोग गर्न सकिन्छ?', a: 'हो, यो उपकरण व्यक्तिगत, शैक्षिक तथा अनुसन्धान प्रयोजनका लागि पूर्ण रूपमा निःशुल्क छ। यसको युनिकोड म्यापिङ आधिकारिक युनिकोड मानक र अंशुमान पाण्डे (मिसिगन विश्वविद्यालय) द्वारा प्रस्तुत तिरहुता इन्कोडिङ प्रस्ताव (L2/11-175R) मा आधारित छ, जसले गर्दा लिपि रूपान्तरणका लागि यो प्राज्ञिक रूपमा विश्वसनीय मानिन्छ। यदि तपाईं ऐतिहासिक तिरहुता पाण्डुलिपिहरूमा काम गर्दै हुनुहुन्छ भने, के कुरामा ध्यान दिनुहोस् भने पुराना ग्रन्थहरूमा केही यस्ता वैकल्पिक अक्षर स्वरूपहरू हुन सक्छन् जुन युनिकोडले पूर्ण रूपमा समेटेको नहुन सक्छ—त्यस्ता विशेष परिस्थितिहरूमा यस उपकरणका साथै विशेषज्ञ विद्वानहरूको परामर्श लिनु पनि उपयुक्त हुन्छ।' },
+                ]
+            },
+            mai: {
+                aboutTitle: 'तिरहुता लिपिक बारेमे',
+                aboutText: `तिरहुता (जकरा मिथिलाक्षर सेहो कहल जाइत अछि) मैथिली भाषाक पारंपरिक लिपि अछि, जे भारतक बिहार राज्य आ नेपालक नारायणी तथा जनकपुर क्षेत्रमे ३.५ करोड सँ बेसी लोक द्वारा बाजल जाइत अछि। गौड़ी (प्रोटो-बंगाली) सँ निकलल ई ब्राह्मी-आधारित लिपि, १४म शताब्दी धरि बंगाली, नेवारी आ ओडिया जेहन संबंधित लिपिसभ सँ अलग भ' क' अपन स्वतंत्र स्वरूप बना लेलक। बिहार आ नेपालक मंदिरसभ पर तिरहुताक सब सँ पुराण शिलालेख १३म शताब्दीक अछि। सदियौँ सँ मैथिल ब्राह्मण आ कायस्थ समुदाय पञ्जी (वंशावली अभिलेख) राखिबाक लेल तिरहुताक प्रयोग करैत छलाह, आ ई धार्मिक पांडुलिपि, साहित्यिक ग्रंथ आ व्यक्तिगत पत्राचारक लेल एखनो प्रयोगमे अछि। तिरहुतामे छपाई १९२० क दशकमे शुरू भेल; आइ बहुत रास साहित्यिक संस्था एहि लिपिमे प्रकाशन जारी रखने अछि। भारत सरकार द्वारा २००४ मे मैथिलीकें अष्टम अनुसूचीमे शामिल कएला क' बाद तिरहुताक प्रति रुचि फेर सँ जागल अछि। यूनिकोड तिरहुताकें U+11480–U+114DF पर एन्कोड कएने अछि, आ ई अनुवादक ओहि मानक सँ प्रत्येक अक्षरक सीधा लिप्यंतरण करैत अछि — मिथिलाक लिखित धरोहरकें आगामी पीढ़ीक लेल सुरक्षित राखिबाक दिशामे ई एकटा छोट मुदा महत्वपूर्ण कदम अछि।`,
+                faqTitle: 'बेर-बेर पुछल जाइत प्रश्न',
+                faqs: [
+                    { q: 'तिरहुता लिपि की अछि?', a: 'तिरहुता (जकरा मिथिलाक्षर वा मैथिल लिपि सेहो कहल जाइत अछि) मिथिला क्षेत्रक मुख्य भाषा मैथिली लिखबाक लेल प्रयुक्त पारंपरिक लिपि अछि, जे बिहार (भारत) आ नेपालक किछु भाग धरि पसरल अछि। ई ब्राह्मी सँ उत्पन्न एकटा अक्षरमाला अछि, जे बांग्ला, नेवारी आ ओडिया लिपिसभ सँ संबंधित अछि आ कम सँ कम १३म शताब्दी सँ प्रचलनमे अछि।' },
+                    { q: 'की तिरहुता लिपि आइ सेहो प्रयोगमे अछि?', a: `हँ। यद्यपि २०म शताब्दीमे मैथिलीक लेल देवनागरी प्रमुख लिपि बनि गेल, मुदा तिरहुता एखनो उत्तर बिहारक किछु भागमे धार्मिक पाण्डुलिपि, वंशावली अभिलेख (पञ्जी), साहित्यिक प्रकाशन आ साइनबोर्डसभक लेल प्रयोग कयल जाइत अछि। मैथिली अकादमी जेहन साहित्यिक संस्थासभ तिरहुतामे प्रकाशन करैत अछि, आ २००४ मे भारतमे मैथिलीकें अनुसूचित भाषाक दर्जा भेटला क' बाद एहिमे रुचि बढ़ल अछि। यूनिकोड संस्करण ७.० (२०१४) मे तिरहुताकें एन्कोड कयलक, जाहि सँ एकर डिजिटल प्रयोग संभव भ' सकल।` },
+                    { q: 'कम्प्यूटरपर तिरहुतामे कोना टाइप करी?', a: 'सबसँ सहज उपाय ई परिवर्तक प्रयोग करब अछि — देवनागरी (मैथिली) पाठ लिखू आ ई तत्काल तिरहुता Unicode अक्षरमे बदलि जाएत। तिरहुता सही देखाएत लेल अपन डिवाइसमे <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Tirhuta" target="_blank" style="color:var(--rust)">Noto Sans Tirhuta</a> फ़ॉन्ट इंस्टॉल करू।' },
+                    { q: 'ई रूपान्तरण केतेक सटीक अछि?', a: 'ई उपकरण देवनागरी (U+0900–U+097F) आ तिरहुता (U+11480–U+114DF) दुनू क लेल आधिकारिक यूनिकोड मानक पर आधारित प्रत्यक्ष यूनिकोड वर्ण-सँ-वर्ण मैपिंग करैत अछि, जे अंशुमान पांडे द्वारा प्रस्तुत यूनिकोड एन्कोडिंग प्रस्ताव (L2/11-175R) सँ लेल गेल अछि। एहिमे प्रत्येक व्यंजन, स्वर, मात्रा चिह्न, विराम (हलन्त), अनुस्वार, विसर्ग, विराम चिह्न आ अंक सही रूप सँ मैप कएल गेल अछि। ई एकटा लिपि रूपांतरक (Transliteration tool) अछि, भाषा अनुवादक नहि — अर्थात ई भाषा केँ बदलने बिना मैथिलीक लिखित रूप केँ एक लिपि सँ दोसर लिपिमे परिवर्तित करैत अछि।' },
+                    { q: 'तिरहुता आ देवनागरीमे की अन्तर अछि?', a: `दुनू लिपिक प्रयोग मैथिली लिखबाक लेल कएल जा सकैत अछि, मुदा देखबामे ई सब बहुत अलग अछि। देवनागरीकें एकटा विशिष्ट क्षैतिज शीर्षरेखा (शिरोरेखा) क साथ ब्लॉक-प्रिंट कएल जाइत अछि। तिरहुताक अपन विशिष्ट अक्षर-रूप अछि — किछु अपन साझा गौड़ी वंशक कारण बंगाली सँ मिलैत-जुलैत अछि, मुदा लिखित रूपमे ई दुनू लिपि एक-दोसरक लेल सहज बोधगम्य नहि अछि। तिरहुता २०म शताब्दी धरि मिथिलाक प्रमुख लिपि छल, जाहि समय सँ देवनागरी बेसी प्रचलित भ' गेल।` },
+                    { q: 'की एहि उपकरणकें शोध कार्यमे प्रयोग कऽ सकैत छी?', a: `हँ। ई उपकरण व्यक्तिगत, शैक्षणिक आ शोधक उद्देश्यक लेल प्रयोग कएबाक हेतु निःशुल्क अछि। यूनिकोड मैपिंग्स यूनिकोड मानक आ आधिकारिक तिरहुता एन्कोडिंग प्रस्ताव (L2/11-175R, अंशुमान पांडे, मिशिगन विश्वविद्यालय) सँ लेल गेल अछि, जाहि सँ ई लिपि रूपांतरणक लेल शैक्षणिक रूप सँ विश्वसनीय आउटपुट प्रदान करैत अछि। जो अहाँ ऐतिहासिक तिरहुता पांडुलिपिसभ पर काज क' रहल छी, तँ ध्यान दियौक जे पुरान ग्रंथ एहन वैकल्पिक अक्षर रूपक प्रयोग कए सकैत अछि जकरा यूनिकोड पूर्ण रूप सँ समेटने नहि अछि — एहन परिस्थितिमे, एहि उपकरणक साथ विशेषज्ञ विद्वानक सलाह लेबाक सेहो सिफारिश कएल जाइत अछि।` },
+                ]
+            }
+        };
+
+        function updateAboutFAQ(lang) {
+            const c = ABOUT_CONTENT[lang];
+            const aboutSection = document.querySelector('.about-section');
+            aboutSection.querySelector('h2').textContent = c.aboutTitle;
+            aboutSection.querySelector('p').innerHTML = c.aboutText;
+            const faqSection = document.querySelector('.faq-section');
+            faqSection.querySelector('h2').textContent = c.faqTitle;
+            const items = faqSection.querySelectorAll('.faq-item');
+            c.faqs.forEach((faq, i) => {
+                if (items[i]) {
+                    items[i].querySelector('summary').textContent = faq.q;
+                    items[i].querySelector('.faq-answer').innerHTML = faq.a;
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // COMPLETE DEVANAGARI ↔ TIRHUTA MAPPING
+        // Source: Unicode encoding proposal L2/11-175R (Pandey 2011)
+        //         Unicode Standard, Tirhuta block U+11480–U+114DF
+        // Format: [tirhutaCp, devaDisplay, devaCp, romanLabel]
+        // ═══════════════════════════════════════════════════════════════════════
+
+        const INDEPENDENT_VOWELS = [
+            [0x11481, 'अ', 0x0905, 'A'],
+            [0x11482, 'आ', 0x0906, 'AA'],
+            [0x11483, 'इ', 0x0907, 'I'],
+            [0x11484, 'ई', 0x0908, 'II'],
+            [0x11485, 'उ', 0x0909, 'U'],
+            [0x11486, 'ऊ', 0x090A, 'UU'],
+            [0x11487, 'ऋ', 0x090B, 'Voc.R'],
+            [0x11488, 'ॠ', 0x0960, 'Voc.RR'],
+            [0x11489, 'ऌ', 0x090C, 'Voc.L'],
+            [0x1148A, 'ॡ', 0x0961, 'Voc.LL'],
+            [0x1148B, 'ए', 0x090F, 'E'],
+            [0x1148C, 'ऐ', 0x0910, 'AI'],
+            [0x1148D, 'ओ', 0x0913, 'O'],
+            [0x1148E, 'औ', 0x0914, 'AU'],
+        ];
+
+        const CONSONANTS = [
+            [0x1148F, 'क', 0x0915, 'KA'],
+            [0x11490, 'ख', 0x0916, 'KHA'],
+            [0x11491, 'ग', 0x0917, 'GA'],
+            [0x11492, 'घ', 0x0918, 'GHA'],
+            [0x11493, 'ङ', 0x0919, 'NGA'],
+            [0x11494, 'च', 0x091A, 'CA'],
+            [0x11495, 'छ', 0x091B, 'CHA'],
+            [0x11496, 'ज', 0x091C, 'JA'],
+            [0x11497, 'झ', 0x091D, 'JHA'],
+            [0x11498, 'ञ', 0x091E, 'NYA'],
+            [0x11499, 'ट', 0x091F, 'TTA'],
+            [0x1149A, 'ठ', 0x0920, 'TTHA'],
+            [0x1149B, 'ड', 0x0921, 'DDA'],
+            [0x1149C, 'ढ', 0x0922, 'DDHA'],
+            [0x1149D, 'ण', 0x0923, 'NNA'],
+            [0x1149E, 'त', 0x0924, 'TA'],
+            [0x1149F, 'थ', 0x0925, 'THA'],
+            [0x114A0, 'द', 0x0926, 'DA'],
+            [0x114A1, 'ध', 0x0927, 'DHA'],
+            [0x114A2, 'न', 0x0928, 'NA'],
+            [0x114A3, 'प', 0x092A, 'PA'],
+            [0x114A4, 'फ', 0x092B, 'PHA'],
+            [0x114A5, 'ब', 0x092C, 'BA'],
+            [0x114A6, 'भ', 0x092D, 'BHA'],
+            [0x114A7, 'म', 0x092E, 'MA'],
+            [0x114A8, 'य', 0x092F, 'YA'],
+            [0x114A9, 'र', 0x0930, 'RA'],
+            [0x114AA, 'ल', 0x0932, 'LA'],
+            [0x114AB, 'व', 0x0935, 'VA'],
+            [0x114AC, 'श', 0x0936, 'SHA'],
+            [0x114AD, 'ष', 0x0937, 'SSA'],
+            [0x114AE, 'स', 0x0938, 'SA'],
+            [0x114AF, 'ह', 0x0939, 'HA'],
+        ];
+
+        // Format: [tirhutaCp, devaCp, romanLabel]
+        const DEP_VOWEL_SIGNS = [
+            [0x114B0, 0x093E, 'AA ा'],
+            [0x114B1, 0x093F, 'I ि'],
+            [0x114B2, 0x0940, 'II ी'],
+            [0x114B3, 0x0941, 'U ु'],
+            [0x114B4, 0x0942, 'UU ू'],
+            [0x114B5, 0x0943, 'Voc.R ृ'],
+            [0x114B6, 0x0944, 'Voc.RR ॄ'],
+            [0x114B7, 0x0962, 'Voc.L ॢ'],
+            [0x114B8, 0x0963, 'Voc.LL ॣ'],
+            [0x114B9, 0x0947, 'E े'],
+            [0x114BA, 0x0946, 'Short E ॆ'],
+            [0x114BB, 0x0948, 'AI ै'],
+            [0x114BC, 0x094B, 'O ो'],
+            [0x114BD, 0x094A, 'Short O ॊ'],
+            [0x114BE, 0x094C, 'AU ौ'],
+        ];
+
+        const VARIOUS_SIGNS = [
+            [0x114BF, 0x0901, 'Candrabindu ँ'],
+            [0x114C0, 0x0902, 'Anusvara ं'],
+            [0x114C1, 0x0903, 'Visarga ः'],
+            [0x114C2, 0x094D, 'Virama ्'],
+            [0x114C3, 0x093C, 'Nukta ़'],
+            [0x114C4, 0x093D, 'Avagraha ऽ'],
+            [0x114C7, 0x0950, 'OM ॐ'],
+        ];
+
+        const PUNCTUATION = [
+            [0x11480, null, 'Anji 𑒀'],
+            [0x114C5, null, 'Gvang'],
+            [0x114C6, null, 'Abbrev.'],
+        ];
+
+        const DIGITS = [
+            [0x114D0, 0x0966, '0 ०'],
+            [0x114D1, 0x0967, '1 १'],
+            [0x114D2, 0x0968, '2 २'],
+            [0x114D3, 0x0969, '3 ३'],
+            [0x114D4, 0x096A, '4 ४'],
+            [0x114D5, 0x096B, '5 ५'],
+            [0x114D6, 0x096C, '6 ६'],
+            [0x114D7, 0x096D, '7 ७'],
+            [0x114D8, 0x096E, '8 ८'],
+            [0x114D9, 0x096F, '9 ९'],
+        ];
+
+        // ── Build D2T: Devanagari codepoint → Tirhuta char ────────────────────────
+        const D2T = {};
+        for (const [tcp, , dcp] of INDEPENDENT_VOWELS) { if (dcp) D2T[dcp] = String.fromCodePoint(tcp); }
+        for (const [tcp, , dcp] of CONSONANTS) { if (dcp) D2T[dcp] = String.fromCodePoint(tcp); }
+        for (const [tcp, dcp] of DEP_VOWEL_SIGNS) { if (dcp) D2T[dcp] = String.fromCodePoint(tcp); }
+        for (const [tcp, dcp] of VARIOUS_SIGNS) { if (dcp) D2T[dcp] = String.fromCodePoint(tcp); }
+        for (const [tcp, dcp] of DIGITS) { if (dcp) D2T[dcp] = String.fromCodePoint(tcp); }
+        // Devanagari danda / double danda → same (shared punctuation per proposal §4.13)
+        D2T[0x0964] = '।';
+        D2T[0x0965] = '॥';
+        // ASCII digits → Tirhuta digits
+        for (let i = 0; i <= 9; i++) D2T[String(i)] = String.fromCodePoint(0x114D0 + i);
+
+        // ── Build T2D: Tirhuta codepoint → Devanagari char (reverse) ─────────────
+        const T2D = {};
+        for (const [tcp, , dcp] of INDEPENDENT_VOWELS) { if (dcp) T2D[tcp] = String.fromCodePoint(dcp); }
+        for (const [tcp, , dcp] of CONSONANTS) { if (dcp) T2D[tcp] = String.fromCodePoint(dcp); }
+        for (const [tcp, dcp] of DEP_VOWEL_SIGNS) { if (dcp) T2D[tcp] = String.fromCodePoint(dcp); }
+        for (const [tcp, dcp] of VARIOUS_SIGNS) { if (dcp) T2D[tcp] = String.fromCodePoint(dcp); }
+        for (const [tcp, dcp] of DIGITS) { if (dcp) T2D[tcp] = String.fromCodePoint(dcp); }
+        // Tirhuta digits → Devanagari digits
+        for (let i = 0; i <= 9; i++) T2D[0x114D0 + i] = String.fromCodePoint(0x0966 + i);
+
+        // ── Converters ────────────────────────────────────────────────────────────
+        function devanagariToTirhuta(text) {
+            let out = '';
+            for (const ch of text) {
+                const cp = ch.codePointAt(0);
+                if (D2T[cp] !== undefined) out += D2T[cp];
+                else if (D2T[ch] !== undefined) out += D2T[ch];
+                else out += ch;
+            }
+            return out;
+        }
+
+        function tirhutaToDevanagari(text) {
+            let out = '';
+            for (const ch of text) {
+                const cp = ch.codePointAt(0);
+                if (T2D[cp] !== undefined) out += T2D[cp];
+                else out += ch;
+            }
+            return out;
+        }
+
+        // ── Main translate handler ────────────────────────────────────────────────
+        async function doTranslate() {
+            const text = document.getElementById('inp').value;
+            if (!text.trim()) return;
+            if (srcLang === tgtLang) { showResult(text, tgtLang); return; }
+
+            setLoading(true);
+            try {
+                let result = '';
+
+                if (srcLang === 'deva' && tgtLang === 'tirhuta') {
+                    result = devanagariToTirhuta(text);
+                } else if (srcLang === 'tirhuta' && tgtLang === 'deva') {
+                    result = tirhutaToDevanagari(text);
+                }
+
+                showResult(result, tgtLang);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ── UI helpers ────────────────────────────────────────────────────────────
+        function setLoading(on) {
+            const btn = document.getElementById('ui-translate-btn');
+            btn.disabled = on;
+            if (on) {
+                const s = UI[currentUILang];
+                document.getElementById('out').innerHTML =
+                    `<div class="loading-state"><div class="spinner"></div>${s.loading}</div>`;
+                document.getElementById('copy-btn').style.display = 'none';
+                document.getElementById('out-info').textContent = '';
+            }
+        }
+
+        function showResult(text, lang) {
+            lastResult = text;
+            const outEl = document.getElementById('out');
+            outEl.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'modi-out';
+            if (lang === 'tirhuta') {
+                div.style.cssText = "font-family:'Noto Sans Tirhuta','Segoe UI Historic',serif;font-size:24px;line-height:2;";
+            } else if (lang === 'deva') {
+                div.style.cssText = "font-family:'Laila',serif;font-size:22px;line-height:1.9;";
+            } else {
+                div.style.cssText = "font-family:'Crimson Pro',Georgia,serif;font-size:18px;line-height:1.7;";
+            }
+            div.textContent = text;
+            outEl.appendChild(div);
+            const s = UI[currentUILang];
+            document.getElementById('out-info').textContent = text.length + ' ' + s.chars;
+            const cb = document.getElementById('copy-btn');
+            cb.style.display = 'inline-block';
+            cb.textContent = s.copyBtn;
+            cb.dataset.label = s.copyBtn;
+        }
+
+        function showError(msg) {
+            document.getElementById('out').innerHTML = `<div class="error-state">${msg}</div>`;
+        }
+
+        function clearOutput() {
+            lastResult = '';
+            const s = UI[currentUILang];
+            document.getElementById('out').innerHTML =
+                `<span class="placeholder-text">${s.outPlaceholder}</span>`;
+            document.getElementById('out-info').textContent = '';
+            document.getElementById('copy-btn').style.display = 'none';
+        }
+
+        function clearAll() {
+            document.getElementById('inp').value = '';
+            updateCount();
+            clearOutput();
+        }
+
+        function updateCount() {
+            const n = document.getElementById('inp').value.length;
+            document.getElementById('count').innerHTML =
+                n + ' <span id="ui-chars">' + UI[currentUILang].chars + '</span>';
+        }
+
+        function copyOut() {
+            if (!lastResult) return;
+            navigator.clipboard.writeText(lastResult).then(() => {
+                const b = document.getElementById('copy-btn');
+                b.textContent = UI[currentUILang].copiedBtn;
+                setTimeout(() => b.textContent = b.dataset.label, 2000);
+            });
+        }
+
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') doTranslate();
+        });
+
+        // ── Build reference chart ─────────────────────────────────────────────────
+        const TF = "font-family:'Noto Sans Tirhuta','Segoe UI Historic',serif";
+
+        function makeCell(tirhutaCp, devaDisplay, romLabel) {
+            const c = document.createElement('div');
+            c.className = 'ref-cell';
+            c.innerHTML =
+                `<span class="ref-tirhuta" style="${TF}">${String.fromCodePoint(tirhutaCp)}</span>` +
+                `<span class="ref-deva">${devaDisplay}</span>` +
+                `<span class="ref-rom">${romLabel}</span>`;
+            return c;
+        }
+
+        const rv = document.getElementById('ref-vowels');
+        for (const [tcp, deva, , label] of INDEPENDENT_VOWELS) rv.appendChild(makeCell(tcp, deva, label));
+
+        const rc = document.getElementById('ref-cons');
+        for (const [tcp, deva, , label] of CONSONANTS) rc.appendChild(makeCell(tcp, deva, label));
+
+        const rm = document.getElementById('ref-matras');
+        const tirKA = String.fromCodePoint(0x1148F); // Tirhuta KA
+        for (const [tcp, dcp, label] of DEP_VOWEL_SIGNS) {
+            const c = document.createElement('div');
+            c.className = 'ref-cell';
+            c.innerHTML =
+                `<span class="ref-tirhuta" style="${TF}">${tirKA}${String.fromCodePoint(tcp)}</span>` +
+                `<span class="ref-deva">क${String.fromCodePoint(dcp)}</span>` +
+                `<span class="ref-rom">${label}</span>`;
+            rm.appendChild(c);
+        }
+
+        const rs = document.getElementById('ref-signs');
+        for (const [tcp, dcp, label] of [...VARIOUS_SIGNS, ...PUNCTUATION]) {
+            rs.appendChild(makeCell(tcp, dcp ? String.fromCodePoint(dcp) : '—', label));
+        }
+
+        const rd = document.getElementById('ref-digits');
+        for (const [tcp, dcp, label] of DIGITS) rd.appendChild(makeCell(tcp, String.fromCodePoint(dcp), label));
+
+        // ── Init ──────────────────────────────────────────────────────────────────
+        updateLangBar();
+
+        // ── Background Tirhuta letter scatter ─────────────────────────────────────
+        (function () {
+            const CHARS = [
+                // Independent vowels
+                0x11481, 0x11482, 0x11483, 0x11484, 0x11485, 0x11486, 0x11487, 0x11488,
+                0x11489, 0x1148A, 0x1148B, 0x1148C, 0x1148D, 0x1148E,
+                // Consonants
+                0x1148F, 0x11490, 0x11491, 0x11492, 0x11493, 0x11494, 0x11495, 0x11496,
+                0x11497, 0x11498, 0x11499, 0x1149A, 0x1149B, 0x1149C, 0x1149D, 0x1149E,
+                0x1149F, 0x114A0, 0x114A1, 0x114A2, 0x114A3, 0x114A4, 0x114A5, 0x114A6,
+                0x114A7, 0x114A8, 0x114A9, 0x114AA, 0x114AB, 0x114AC, 0x114AD, 0x114AE, 0x114AF,
+                // Special signs
+                0x11480, 0x114C7,
+                // Digits
+                0x114D0, 0x114D1, 0x114D2, 0x114D3, 0x114D4,
+                0x114D5, 0x114D6, 0x114D7, 0x114D8, 0x114D9
+            ].map(cp => String.fromCodePoint(cp));
+
+            const bg = document.getElementById('tirhuta-bg');
+            const points = [];
+            const isMobile = window.innerWidth < 768;
+            const count = isMobile ? 30 : 80;
+            const maxSizeBase = isMobile ? 50 : 110;
+
+            let attempts = 0, placed = 0;
+
+            while (placed < count && attempts < 1500) {
+                attempts++;
+
+                const testLeft = Math.random() * 94 + 3;
+                const testTop = Math.random() * 94 + 3;
+                const size = 18 + Math.floor(Math.random() * maxSizeBase);
+                const radius = (size / 10);
+
+                let tooClose = false;
+                for (const p of points) {
+                    const dx = testLeft - p.left;
+                    const dy = testTop - p.top;
+                    if (Math.sqrt(dx * dx + dy * dy) < (radius + p.radius)) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (!tooClose) {
+                    const span = document.createElement('span');
+                    span.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    const rot = (Math.random() - 0.5) * 100;
+                    const op = 0.1 + Math.random() * 0.05;
+
+                    span.style.cssText = `
+            position: absolute;
+            font-family: 'Noto Sans Tirhuta', serif;
+            font-size: ${size}px;
+            left: ${testLeft.toFixed(1)}%;
+            top: ${testTop.toFixed(1)}%;
+            transform: translate(-50%, -50%) rotate(${rot.toFixed(1)}deg);
+            opacity: ${op.toFixed(3)};
+            white-space: nowrap;
+            user-select: none;
+            color: var(--ink);
+          `;
+
+                    bg.appendChild(span);
+                    points.push({ left: testLeft, top: testTop, radius: radius });
+                    placed++;
+                }
+            }
+        })();
+
+        window.addEventListener('scroll', () => {
+            const bg = document.getElementById('tirhuta-bg');
+            // Adjust '0.2' to make the movement faster or slower
+            const offset = window.pageYOffset * 0.2;
+            bg.style.transform = `translateY(-${offset}px)`;
+        });
+    </script>
+</body>
+
+</html>
