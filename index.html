@@ -1188,12 +1188,9 @@
 
             const scale = 2;
             canvas.width = 800 * scale;
-
-            // REDUCED PADDING: Text will stretch closer to the edges
-            const padding = 30 * scale;
+            const padding = 40 * scale;
             const maxWidth = canvas.width - (padding * 2);
 
-            // BIGGER FONTS: Increased base sizes so text covers more of the picture
             let fontStr = tgtLang === 'tirhuta' ? `${56 * scale}px 'Noto Sans Tirhuta'` :
                 tgtLang === 'deva' ? `${48 * scale}px 'Laila'` : `${40 * scale}px 'Crimson Pro'`;
             let lineHeight = tgtLang === 'tirhuta' ? 90 * scale : 75 * scale;
@@ -1202,7 +1199,6 @@
             const paragraphs = lastResult.split('\n');
             let lines = [];
 
-            // 1. PRE-CALCULATE TEXT WRAPPING (Find out exactly how many lines we have)
             paragraphs.forEach(p => {
                 if (!p.trim()) { lines.push(''); return; }
                 const words = p.split(' ');
@@ -1219,44 +1215,58 @@
                 lines.push(currentLine.trim());
             });
 
-            // 2. VERTICAL CENTERING MATH
             const textBlockHeight = lines.length * lineHeight;
-
-            // Set canvas height: Make it grow for long text, but set a nice minimum height (600) for short text
-            canvas.height = Math.max(textBlockHeight + (padding * 4), 600 * scale);
-
-            // Find the perfect starting Y position so the text block is exactly in the middle
+            canvas.height = Math.max(textBlockHeight + (padding * 5), 600 * scale);
             let startY = (canvas.height - textBlockHeight) / 2;
 
             // Draw Background
-            ctx.fillStyle = '#eaf2f8'; // var(--paper)
+            ctx.fillStyle = '#eaf2f8';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Border Frame
-            ctx.strokeStyle = 'rgba(31, 78, 139, 0.25)'; // var(--border)
+            // --- BORDER WITH BREAK FOR TEXT ---
+            ctx.strokeStyle = 'rgba(31, 78, 139, 0.25)';
             ctx.lineWidth = 4 * scale;
-            ctx.strokeRect(15 * scale, 15 * scale, canvas.width - (30 * scale), canvas.height - (30 * scale));
+            const b = 15 * scale; // Border offset
+            const w = canvas.width;
+            const h = canvas.height;
 
-            // Draw Text
-            ctx.fillStyle = '#0a1420'; // var(--ink)
+            // Set up watermark text properties to measure it
+            const watermarkText = "Tirhuta Lipi Translator";
+            const watermarkFont = `italic ${18 * scale}px 'Crimson Pro', serif`;
+            ctx.font = watermarkFont;
+            const textWidth = ctx.measureText(watermarkText).width;
+            const textGap = 15 * scale; // Gap space around the text
+
+            ctx.beginPath();
+            // 1. Top line
+            ctx.moveTo(b, b); ctx.lineTo(w - b, b);
+            // 2. Right line
+            ctx.moveTo(w - b, b); ctx.lineTo(w - b, h - b);
+            // 3. Left line
+            ctx.moveTo(b, b); ctx.lineTo(b, h - b);
+            // 4. Bottom line (The split one)
+            ctx.moveTo(b, h - b);
+            ctx.lineTo(w - b - textWidth - (textGap * 2), h - b); // Stop before text
+            ctx.moveTo(w - b, h - b); // This closes the tiny corner on the far right
+            ctx.stroke();
+
+            // Draw Watermark inside the break
+            ctx.fillStyle = "rgba(26, 15, 10, 0.5)";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.fillText(watermarkText, w - b - textGap, h - b);
+
+            // --- DRAW MAIN TRANSLATION TEXT ---
+            ctx.fillStyle = '#0a1420';
             ctx.font = fontStr;
             ctx.textBaseline = 'top';
-            ctx.textAlign = 'center'; // HORIZONTAL CENTER
-
+            ctx.textAlign = 'center';
             const centerX = canvas.width / 2;
 
-            // 3. DRAW LINES
-            // Draw each line starting from the vertically centered Y position we calculated
             lines.forEach(line => {
                 ctx.fillText(line, centerX, startY);
                 startY += lineHeight;
             });
-
-            // Draw faint watermark at bottom
-            ctx.font = `italic ${20 * scale}px 'Crimson Pro', serif`;
-            ctx.fillStyle = "rgba(26, 15, 10, 0.4)";
-            ctx.textAlign = "right";
-            ctx.fillText("Tirhuta Lipi Translator", canvas.width - (25 * scale), canvas.height - (25 * scale));
 
             outEl.appendChild(canvas);
         }
@@ -1579,6 +1589,8 @@
             } finally {
                 setLoading(false);
             }
+
+            updateCount();
         }
 
         // ── UI helpers ────────────────────────────────────────────────────────────
@@ -1654,12 +1666,28 @@
         }
 
         function updateCount() {
-            const n = document.getElementById('inp').value.length;
-            document.getElementById('count').innerHTML =
-                n + ' <span id="ui-chars">' + UI[currentUILang].chars + '</span>';
+            // .trim() removes spaces from the start and end of the text
+            const input = document.getElementById('inp').value.trim();
+            const uiL = currentUILang;
 
-            // Revert back to text mode immediately if user types
+            // Using [...] spreads the string into true Unicode characters.
+            // "म" + "े" + "र" + "ा" = 4
+            const inputCount = [...input].length;
+
+            document.getElementById('count').innerHTML =
+                inputCount + ' <span id="ui-chars">' + UI[uiL].chars + '</span>';
+
+            // Revert image to text if user types
             if (isImageMode) toggleImageMode();
+
+            // Update the output counter using the same logic
+            const outInfo = document.getElementById('out-info');
+            if (lastResult && outInfo) {
+                const outputCount = [...lastResult.trim()].length;
+                outInfo.textContent = outputCount + ' ' + UI[uiL].chars;
+            } else if (outInfo) {
+                outInfo.textContent = "";
+            }
         }
 
         function copyOut() {
