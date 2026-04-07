@@ -770,6 +770,22 @@
             overflow: hidden;
             pointer-events: none;
         }
+
+        /* ── Canvas Image Output ── */
+        #out canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 18px var(--shadow);
+            background: var(--paper);
+        }
+
+        .btn.active-img {
+            background: rgba(196, 146, 42, .12);
+            border-color: var(--gold);
+            color: var(--rust);
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -841,6 +857,8 @@
                     <div class="bar">
                         <span id="out-info"></span>
                         <div class="bar-right">
+                            <button class="btn" id="img-toggle-btn" style="display:none"
+                                onclick="toggleImageMode()">Image</button>
                             <button class="btn" id="copy-btn" style="display:none" onclick="copyOut()"
                                 data-label="Copy">Copy</button>
                         </div>
@@ -1043,6 +1061,9 @@
                 refMatras: 'Dependent Vowel Signs (Matras)',
                 refSigns: 'Various Signs & Punctuation',
                 refDigits: 'Digits',
+                imgBtn: 'Image',
+                downloadBtn: 'Download',
+                downloadedBtn: 'Downloaded!',
             },
             hi: {
                 eyebrow: 'प्राचीन लिपि परिवर्तक',
@@ -1067,6 +1088,9 @@
                 refMatras: 'मात्राएँ',
                 refSigns: 'विविध चिह्न एवं विराम',
                 refDigits: 'अंक',
+                imgBtn: 'चित्र',
+                downloadBtn: 'डाउनलोड',
+                downloadedBtn: 'डाउनलोड हुआ!',
             },
             ne: {
                 eyebrow: 'प्राचीन लिपि परिवर्तक',
@@ -1091,6 +1115,9 @@
                 refMatras: 'मात्राहरू',
                 refSigns: 'विविध चिह्न र विराम',
                 refDigits: 'अङ्कहरू',
+                imgBtn: 'तस्वीर',
+                downloadBtn: 'डाउनलोड',
+                downloadedBtn: 'डाउनलोड भयो!',
             },
             mai: {
                 eyebrow: 'प्राचीन लिपि परिवर्तक',
@@ -1115,6 +1142,9 @@
                 refMatras: 'मात्राएँ',
                 refSigns: 'विविध चिह्न',
                 refDigits: 'अंक',
+                imgBtn: 'चित्र',
+                downloadBtn: 'डाउनलोड',
+                downloadedBtn: 'डाउनलोड भेल!',
             }
         };
 
@@ -1128,6 +1158,108 @@
         let srcLang = 'deva';
         let tgtLang = 'tirhuta';
         let lastResult = '';
+        let isImageMode = false;
+
+        function toggleImageMode() {
+            if (!lastResult) return;
+            isImageMode = !isImageMode;
+            const imgBtn = document.getElementById('img-toggle-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const s = UI[currentUILang];
+
+            if (isImageMode) {
+                imgBtn.classList.add('active-img');
+                copyBtn.textContent = s.downloadBtn;
+                copyBtn.dataset.label = s.downloadBtn;
+                renderCanvas();
+            } else {
+                imgBtn.classList.remove('active-img');
+                copyBtn.textContent = s.copyBtn;
+                copyBtn.dataset.label = s.copyBtn;
+                showResult(lastResult, tgtLang); // Redraw text
+            }
+        }
+
+        function renderCanvas() {
+            const outEl = document.getElementById('out');
+            outEl.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const scale = 2;
+            canvas.width = 800 * scale;
+
+            // REDUCED PADDING: Text will stretch closer to the edges
+            const padding = 30 * scale;
+            const maxWidth = canvas.width - (padding * 2);
+
+            // BIGGER FONTS: Increased base sizes so text covers more of the picture
+            let fontStr = tgtLang === 'tirhuta' ? `${56 * scale}px 'Noto Sans Tirhuta'` :
+                tgtLang === 'deva' ? `${48 * scale}px 'Laila'` : `${40 * scale}px 'Crimson Pro'`;
+            let lineHeight = tgtLang === 'tirhuta' ? 90 * scale : 75 * scale;
+
+            ctx.font = fontStr;
+            const paragraphs = lastResult.split('\n');
+            let lines = [];
+
+            // 1. PRE-CALCULATE TEXT WRAPPING (Find out exactly how many lines we have)
+            paragraphs.forEach(p => {
+                if (!p.trim()) { lines.push(''); return; }
+                const words = p.split(' ');
+                let currentLine = '';
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = currentLine + words[n] + ' ';
+                    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = words[n] + ' ';
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine.trim());
+            });
+
+            // 2. VERTICAL CENTERING MATH
+            const textBlockHeight = lines.length * lineHeight;
+
+            // Set canvas height: Make it grow for long text, but set a nice minimum height (600) for short text
+            canvas.height = Math.max(textBlockHeight + (padding * 4), 600 * scale);
+
+            // Find the perfect starting Y position so the text block is exactly in the middle
+            let startY = (canvas.height - textBlockHeight) / 2;
+
+            // Draw Background
+            ctx.fillStyle = '#eaf2f8'; // var(--paper)
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Border Frame
+            ctx.strokeStyle = 'rgba(31, 78, 139, 0.25)'; // var(--border)
+            ctx.lineWidth = 4 * scale;
+            ctx.strokeRect(15 * scale, 15 * scale, canvas.width - (30 * scale), canvas.height - (30 * scale));
+
+            // Draw Text
+            ctx.fillStyle = '#0a1420'; // var(--ink)
+            ctx.font = fontStr;
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'center'; // HORIZONTAL CENTER
+
+            const centerX = canvas.width / 2;
+
+            // 3. DRAW LINES
+            // Draw each line starting from the vertically centered Y position we calculated
+            lines.forEach(line => {
+                ctx.fillText(line, centerX, startY);
+                startY += lineHeight;
+            });
+
+            // Draw faint watermark at bottom
+            ctx.font = `italic ${20 * scale}px 'Crimson Pro', serif`;
+            ctx.fillStyle = "rgba(26, 15, 10, 0.4)";
+            ctx.textAlign = "right";
+            ctx.fillText("Tirhuta Lipi Translator", canvas.width - (25 * scale), canvas.height - (25 * scale));
+
+            outEl.appendChild(canvas);
+        }
 
         function setUILang(lang) {
             currentUILang = lang;
@@ -1152,9 +1284,17 @@
             document.getElementById('ui-ref-matras').textContent = s.refMatras;
             document.getElementById('ui-ref-signs').textContent = s.refSigns;
             document.getElementById('ui-ref-digits').textContent = s.refDigits;
+            const imgBtn = document.getElementById('img-toggle-btn');
+            if (imgBtn) imgBtn.textContent = s.imgBtn;
+
             const copyBtn = document.getElementById('copy-btn');
-            copyBtn.dataset.label = s.copyBtn;
-            if (copyBtn.textContent !== s.copiedBtn) copyBtn.textContent = s.copyBtn;
+            if (isImageMode) {
+                copyBtn.dataset.label = s.downloadBtn;
+                if (copyBtn.textContent !== s.downloadedBtn) copyBtn.textContent = s.downloadBtn;
+            } else {
+                copyBtn.dataset.label = s.copyBtn;
+                if (copyBtn.textContent !== s.copiedBtn) copyBtn.textContent = s.copyBtn;
+            }
             const ph = document.getElementById('out').querySelector('.placeholder-text');
             if (ph) ph.textContent = s.outPlaceholder;
             // Fix panel-head letter-spacing for Indic UI
@@ -1446,6 +1586,12 @@
             const btn = document.getElementById('ui-translate-btn');
             btn.disabled = on;
             if (on) {
+                isImageMode = false;
+                const imgBtn = document.getElementById('img-toggle-btn');
+                if (imgBtn) {
+                    imgBtn.classList.remove('active-img');
+                    imgBtn.style.display = 'none';
+                }
                 const s = UI[currentUILang];
                 document.getElementById('out').innerHTML =
                     `<div class="loading-state"><div class="spinner"></div>${s.loading}</div>`;
@@ -1471,6 +1617,12 @@
             outEl.appendChild(div);
             const s = UI[currentUILang];
             document.getElementById('out-info').textContent = text.length + ' ' + s.chars;
+
+            // Show Image and Copy buttons
+            const imgBtn = document.getElementById('img-toggle-btn');
+            imgBtn.style.display = 'inline-block';
+            imgBtn.textContent = s.imgBtn;
+
             const cb = document.getElementById('copy-btn');
             cb.style.display = 'inline-block';
             cb.textContent = s.copyBtn;
@@ -1483,6 +1635,11 @@
 
         function clearOutput() {
             lastResult = '';
+            isImageMode = false;
+            const imgBtn = document.getElementById('img-toggle-btn');
+            imgBtn.classList.remove('active-img');
+            imgBtn.style.display = 'none';
+
             const s = UI[currentUILang];
             document.getElementById('out').innerHTML =
                 `<span class="placeholder-text">${s.outPlaceholder}</span>`;
@@ -1500,15 +1657,32 @@
             const n = document.getElementById('inp').value.length;
             document.getElementById('count').innerHTML =
                 n + ' <span id="ui-chars">' + UI[currentUILang].chars + '</span>';
+
+            // Revert back to text mode immediately if user types
+            if (isImageMode) toggleImageMode();
         }
 
         function copyOut() {
             if (!lastResult) return;
-            navigator.clipboard.writeText(lastResult).then(() => {
-                const b = document.getElementById('copy-btn');
-                b.textContent = UI[currentUILang].copiedBtn;
-                setTimeout(() => b.textContent = b.dataset.label, 2000);
-            });
+            const b = document.getElementById('copy-btn');
+            const s = UI[currentUILang];
+
+            if (isImageMode) {
+                const canvas = document.querySelector('#out canvas');
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.download = 'tirhuta-translation.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    b.textContent = s.downloadedBtn;
+                    setTimeout(() => b.textContent = b.dataset.label, 2000);
+                }
+            } else {
+                navigator.clipboard.writeText(lastResult).then(() => {
+                    b.textContent = s.copiedBtn;
+                    setTimeout(() => b.textContent = b.dataset.label, 2000);
+                });
+            }
         }
 
         document.addEventListener('keydown', e => {
